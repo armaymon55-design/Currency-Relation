@@ -1,0 +1,47 @@
+name: publish public site
+
+# Rebuilds the static site from the ECB's daily reference rates and force-pushes it to
+# the `site` branch, which Vercel deploys. 15:45 UTC is after the ~16:00 CET fix in both
+# winter (16:45 CET) and summer (17:45 CEST). GitHub may run it up to ~30 min late.
+on:
+  schedule:
+    - cron: "45 15 * * 1-5"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: publish-site
+  cancel-in-progress: true
+
+jobs:
+  build-and-publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: install
+        run: pip install --quiet pandas numpy pytest
+
+      - name: check the build on synthetic data
+        run: python -m pytest tests/test_public.py -q
+
+      - name: build from ECB rates
+        run: python -m public.build
+
+      - name: publish to the site branch
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          cd public/site
+          git init -q -b site
+          git config user.name "currency-relations-bot"
+          git config user.email "currency-relations-bot@users.noreply.github.com"
+          git add -A
+          git commit -q -m "site build $(date -u +%Y-%m-%dT%H:%MZ)"
+          git push --force "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" site

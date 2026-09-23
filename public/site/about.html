@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>How currency relations works</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="top">
+  <div>
+    <h1>How this works</h1>
+    <p class="sub">The method behind the numbers, in plain words. <a href="index.html">Back to the dashboard</a></p>
+  </div>
+</header>
+<main class="prose">
+  <section class="card">
+    <h2>The question it answers</h2>
+    <p>For any currency pair and any currency basket, three things: <b>which way</b> they move together (inverse or direct), <b>how much</b> — the ratio, how many percent the pair has moved for every 1% the basket moved — and <b>how reliable</b> that has been. Then a fourth: <b>is today's reading normal for this pair?</b></p>
+    <p>A pair like EUR/USD is a tug-of-war between two currencies. Measuring it against each currency's basket splits every move into its two legs: how much was the euro, how much was the dollar.</p>
+  </section>
+
+  <section class="card">
+    <h2>The baskets</h2>
+    <p>Each currency's basket is its <b>equal-weight strength</b>: the average of its log rate against the other nine G10 currencies. With equal weights the arithmetic is exact — a pair's return is precisely the difference of its two currencies' strength changes, so the "who moved it" split always adds to 100%.</p>
+    <p>When a pair is measured against one of its own currencies, the basket used <b>leaves the counterpart out</b>. Otherwise the basket would already contain the pair and the relationship would be partly arithmetic rather than information.</p>
+    <p>There is deliberately no "dollar index" here. The published U.S. Dollar Index is ICE's, name and formula; the USD basket on this page is the equal-weight measure described above, which is different and ours.</p>
+  </section>
+
+  <section class="card">
+    <h2>The measurements</h2>
+    <ul>
+      <li><b>Correlation</b> of daily log returns over a rolling window of 20, 50 or 100 trading days. Above +0.4 is called direct, below −0.4 inverse, in between no real link.</li>
+      <li><b>Ratio</b> (beta): the regression slope of the pair's return on the basket's return over the same window.</li>
+      <li><b>R²</b>: how much of the pair's movement the basket accounts for.</li>
+      <li><b>Normal band</b>: the 10th–90th percentile of that pair's own rolling correlation over the last 500 trading days. A reading outside the band is <i>tighter</i> or <i>looser</i> than normal.</li>
+      <li><b>Seesaw broken</b>: a relationship that is normally strong (median |correlation| ≥ 0.6) has fallen below the no-link line.</li>
+    </ul>
+    <p>The 3D map shows the ten currencies as spheres, linked by the correlation between their baskets. A physics layout pulls currencies that move together close and pushes the rest apart, so the blocs you see are found in the data, not drawn by hand. Bloc colours come from the long-run structure; links from the current window.</p>
+  </section>
+
+  <section class="card">
+    <h2>The data</h2>
+    <p>Rates are the <a href="https://www.ecb.europa.eu/stats/policy_and_exchange_rates/euro_reference_exchange_rates/html/index.en.html" rel="noopener">European Central Bank's euro foreign exchange reference rates</a>: one fix per working day, published around 16:00 CET, history back to 1999, reused under the ECB's open data policy. All 45 pairs are ratios of the ECB's euro rates. The page rebuilds every working day after the fix.</p>
+    <p>Reference rates are an official daily fix, not tradeable prices, and this page is daily by design. It is a picture of how the G10 currencies have moved together over years, not a live ticker.</p>
+  </section>
+
+  <section class="card">
+    <h2>What it is not</h2>
+    <p>Everything here measures <b>past co-movement</b>. None of it is a forecast: a strong correlation says two things have moved together, not that one will move because the other did. The "what if" box is conditional arithmetic on today's ratios and says so. Nothing on this site is investment advice, and it comes with no warranty of accuracy, completeness or timeliness.</p>
+  </section>
+</main>
+<footer class="foot"><p><a href="index.html">Back to the dashboard</a></p></footer>
+</body>
+</html>

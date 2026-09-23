@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Currency relations</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<header class="top">
+  <div>
+    <h1>Currency relations</h1>
+    <p class="sub">Which way, how much, how reliable — every G10 pair against every currency index. <span id="asof" class="muted"></span></p>
+    <div id="live" class="live off">Checking the live updater…</div>
+  </div>
+  <div class="controls">
+    <div class="seg" id="tf">
+      {% for t in timeframes %}<button data-v="{{ t }}" class="{{ 'on' if t == 'H1' else '' }}">{{ t }}</button>{% endfor %}
+    </div>
+    <div class="seg" id="win">
+      {% for w in windows %}<button data-v="{{ w }}" class="{{ 'on' if w == default_window else '' }}">{{ w }} bars</button>{% endfor %}
+    </div>
+  </div>
+</header>
+
+<nav class="tabs">
+  <button data-tab="grid" class="on">Grid</button>
+  <button data-tab="map">3D currency map</button>
+</nav>
+
+<main>
+<div id="tab-grid">
+  <section class="card" id="focus">
+    <div class="focus-head">
+      <h2 id="focus-title">EUR/USD vs DXY</h2>
+      <span class="pill" id="pill"></span>
+    </div>
+    <div class="tiles">
+      <div class="tile"><p class="l">Which way</p><p class="v" id="t-way">–</p><p class="s" id="t-way-s"></p></div>
+      <div class="tile"><p class="l">How much (ratio)</p><p class="v" id="t-ratio">–</p><p class="s" id="t-ratio-s"></p></div>
+      <div class="tile"><p class="l">How reliable</p><p class="v" id="t-rel">–</p><p class="s" id="t-rel-s"></p></div>
+    </div>
+
+    <div class="split">
+      <h3>Who moved <span id="split-pair"></span> <span class="muted" id="split-window"></span></h3>
+      <div class="bar"><div class="seg-base" id="seg-base"></div><div class="seg-quote" id="seg-quote"></div></div>
+      <p class="s" id="split-text"></p>
+    </div>
+
+    <div class="whatif">
+      <h3>What if <span class="muted">conditional arithmetic on today's ratios — not a forecast</span></h3>
+      <div class="wi-controls">
+        <span>If</span>
+        <select id="wi-index"></select>
+        <span>moves</span>
+        <input type="number" id="wi-move" value="1" step="0.25" min="-25" max="25" aria-label="move in percent">
+        <span>%, then:</span>
+        <span class="muted" id="wi-note"></span>
+      </div>
+      <div class="wi-scroll"><table id="wi-table"></table></div>
+    </div>
+
+    <div class="chart-wrap">
+      <h3>Seesaw health <span class="muted">correlation over the last 300 bars · shaded = normal band · dashed = no-link line</span></h3>
+      <div class="chart"><canvas id="chart" role="img" aria-label="Rolling correlation with its normal band"></canvas></div>
+    </div>
+  </section>
+
+  <section class="card">
+    <div class="grid-head">
+      <h2>Relationship grid <span class="muted">number = ratio (% pair per 1% index)</span></h2>
+      <div class="legend">
+        <span><i class="sw inv"></i>inverse</span>
+        <span><i class="sw dir"></i>direct</span>
+        <span><i class="sw non"></i>no real link</span>
+        <span><i class="sw warn"></i>not normal for this pair</span>
+        <span><i class="sw broken"></i>seesaw broken</span>
+      </div>
+    </div>
+    <p class="s muted">Click any cell to focus it. A pair's own currencies are measured against an index that leaves the counterpart out, so the basket never contains the pair itself.</p>
+    <div class="grid-scroll"><table id="grid"></table></div>
+  </section>
+
+  <section class="card">
+    <h2>Not normal right now <span class="muted" id="counts"></span></h2>
+    <ul id="anomalies" class="anoms"></ul>
+  </section>
+</div>
+
+<div id="tab-map" hidden>
+  <section class="card">
+    <div class="grid-head">
+      <h2>Currency map <span class="muted" id="map-asof"></span></h2>
+      <div class="map-controls">
+        <label class="chk"><input type="checkbox" id="map-strong"> only strong links (|corr| ≥ 0.6)</label>
+        <button id="map-freeze">Freeze</button>
+      </div>
+    </div>
+    <p class="s muted">Nobody places the spheres: currencies whose strength indices move together are pulled close, the rest are pushed apart — so the blocs separate on their own. Sphere size = how far the currency moved over the recent window. Drag to rotate, scroll to zoom, click a sphere for its links.</p>
+    <div class="legend map-legend">
+      <span><i class="dot" style="background:#2a78d6"></i><span id="leg-dollar">dollar bloc</span></span>
+      <span><i class="dot" style="background:#d95926"></i><span id="leg-other">other bloc</span></span>
+      <span><i class="ln" style="background:#1D9E75"></i>move together</span>
+      <span><i class="ln" style="background:#E24B4A"></i>move opposite</span>
+      <span><i class="ln" style="background:#EF9F27"></i>not normal for that pair</span>
+      <span><i class="ln" style="background:#B4B2A9"></i>normally strong, now broken</span>
+    </div>
+    <div class="map-wrap"><div id="map"></div><div id="map-labels"></div></div>
+    <div id="map-info" class="s"></div>
+  </section>
+</div>
+</main>
+
+<script>window.DEFAULT_WINDOW = {{ default_window }};</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/3d-force-graph/dist/3d-force-graph.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/force-graph/dist/force-graph.min.js"></script>
+<script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+</html>

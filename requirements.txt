@@ -1,0 +1,6 @@
+MetaTrader5>=5.0.5000
+pandas>=2.2
+numpy>=1.26
+pytest>=8
+flask>=3
+waitress>=3
